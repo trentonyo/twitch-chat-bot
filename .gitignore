@@ -120,5 +120,6 @@ dist
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
+.idea
 
 config.json

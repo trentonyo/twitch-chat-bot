@@ -4,6 +4,8 @@ A Chat Bot application for Twitch Channel Chats.
 
 Referenced in this [Medium Article](https://medium.com/codex/creating-a-twitch-chat-bot-ca368321b7f7).
 
+[New token](https://id.twitch.tv/oauth2/authorize?client_id=w322c0h23vfk7o6x3ymj3l03l6m5ic&redirect_uri=http://localhost&response_type=code&scope=chat:read%20chat:edit)
+
 ## Pre-requisites
 
 To run this application node.js and npm are required to be installed.
