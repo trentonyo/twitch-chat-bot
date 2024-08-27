@@ -73,7 +73,7 @@ export class TwitchChatBot {
         const files = fs.readdirSync(behaviorsDir);
 
         for (const file of files) {
-            if (file !== "IBehavior.ts" && (file.endsWith('.ts') || file.endsWith('.js'))) {
+            if (!file.startsWith("IBehavior") && (file.endsWith('.ts') || file.endsWith('.js'))) {
                 const behaviorModule = await import(path.join(behaviorsDir, file));
                 const BehaviorClass = behaviorModule.default || Object.values(behaviorModule)[0];  // Check for default export first
                 const behaviorInstance = new (BehaviorClass as any)(this.twitchClient);
