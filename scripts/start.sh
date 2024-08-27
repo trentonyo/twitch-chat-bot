@@ -5,6 +5,8 @@ if [ -f .env ]; then
     export $(grep -v '^#' .env | xargs)
 fi
 
+npm install
+
 # Authorization URL
 AUTH_URL="https://id.twitch.tv/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=chat:read%20chat:edit"
 
