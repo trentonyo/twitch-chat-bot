@@ -77,18 +77,25 @@ python3 -c "
 import json
 import sys
 
-config = {}
+config = {'twitch': {}}
 # Read the config.json file
-with open('config.json', 'r') as input:
-   config = json.loads(input.read())
+try:
+    with open('config.json', 'r') as input:
+        config = json.loads(input.read())
+except FileNotFoundError:
+    print('No config.json found, creating a new one')
 
 # Capture the RESPONSE environment variable safely
-response = sys.argv[1]
-config['twitch']['authorization_code'] = response
+config['twitch']['authorization_code']  = sys.argv[1]
+config['twitch']['username']            = sys.argv[2]
+config['twitch']['client_id']           = sys.argv[3]
+config['twitch']['client_secret']       = sys.argv[4]
+config['twitch']['channel']             = sys.argv[5]
+config['twitch']['token_endpoint']      = 'https://id.twitch.tv/oauth2/token'
 
 # Write the updated config.json file
 with open('config.json', 'w') as output:
    output.write(json.dumps(config, indent=2))
- " "$AUTH_CODE"
+" "$AUTH_CODE" "$USERNAME" "$CLIENT_ID" "$CLIENT_SECRET" "$CHANNEL"
 
 npm start

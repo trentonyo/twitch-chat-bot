@@ -88,20 +88,16 @@ export class TwitchChatBot {
     private async setupBotBehavior() {
         await this.loadBehaviors();
 
-        this.twitchClient.on('message', (channel: any, tags: any, message: any, self: any) => {
-            if (message.startsWith('!')) {
+        this.twitchClient.on('message', (channel: any, tags: any, message: string, self: any) => {
+            if (message.toLowerCase().startsWith('!')) {
                 for (const behavior of this.behaviors) {
-                    if (message === behavior.command) {
+                    if (message.toLowerCase() === behavior.command) {
                         behavior.execute(channel, tags, message);
                         break;
                     }
                 }
             }
         });
-    }
-
-    private sayHelloToUser(channel: any, tags: any) {
-            this.twitchClient.say(channel, `Hello, ${ tags.username }! Welcome to the channel.`);
     }
 
     private buildConnectionConfig(channel: string, username: string, accessToken: string) {
