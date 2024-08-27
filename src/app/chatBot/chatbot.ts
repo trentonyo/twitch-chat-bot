@@ -2,7 +2,9 @@ import { ChatBotConfig } from './../config/config.model';
 import { TwitchTokenDetails } from './../models/twitchTokenDetails.models';
 import { TwitchTokenResponseValidator } from './../utils/TwitchTokenResponseValidator';
 import { MalformedTwitchRequestError, NoTwitchResponseError, TwitchResponseError } from '../models/error.model';
-
+import { IBehavior } from '../behaviors/IBehavior';
+import fs from 'fs';
+import path from 'path';
 
 export class TwitchChatBot {
 
@@ -10,6 +12,7 @@ export class TwitchChatBot {
 
     public twitchClient: any;
     private tokenDetails!: TwitchTokenDetails;
+    private behaviors: IBehavior[] = [];
 
     constructor(private config: ChatBotConfig) { }
 
@@ -65,13 +68,35 @@ export class TwitchChatBot {
         //TODO if needed - twitch apparently only requires the token on login so it is good enough for now to just get a token on start-up.
     }
 
-    private setupBotBehavior() {
-        this.twitchClient.on('message', (channel: any, tags: any, message: any, self: any) => {
-            let helloCommand = "!hello"
+    private async loadBehaviors() {
+        const behaviorsDir = path.resolve(__dirname, '../behaviors');
+        const files = fs.readdirSync(behaviorsDir);
 
-            //! means a command is coming by, and we check if it matches the command we currently support
-            if (message.startsWith('!') && message === helloCommand)
-                this.sayHelloToUser(channel,tags);
+        for (const file of files) {
+            if (file !== "IBehavior.ts" && (file.endsWith('.ts') || file.endsWith('.js'))) {
+                const behaviorModule = await import(path.join(behaviorsDir, file));
+                const BehaviorClass = behaviorModule.default || Object.values(behaviorModule)[0];  // Check for default export first
+                const behaviorInstance = new (BehaviorClass as any)(this.twitchClient);
+
+                if ('execute' in behaviorInstance && 'command' in behaviorInstance) {
+                    this.behaviors.push(behaviorInstance);
+                }
+            }
+        }
+    }
+
+    private async setupBotBehavior() {
+        await this.loadBehaviors();
+
+        this.twitchClient.on('message', (channel: any, tags: any, message: any, self: any) => {
+            if (message.startsWith('!')) {
+                for (const behavior of this.behaviors) {
+                    if (message === behavior.command) {
+                        behavior.execute(channel, tags, message);
+                        break;
+                    }
+                }
+            }
         });
     }
 
