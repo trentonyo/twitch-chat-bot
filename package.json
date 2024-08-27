@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "tsc && node ./dist/app.js"
+    "build": "tsc",
+    "start": "npm run build && node ./dist/app.js"
   },
   "dependencies": {
     "axios": "^0.24.0",

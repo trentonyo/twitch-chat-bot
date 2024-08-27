@@ -1,7 +1,7 @@
-import { IBehavior } from './IBehavior';
+import { IChatCommand } from './IChatCommand';
 import { TwitchClient } from 'tmi.js';
 
-export class BehaviorClass implements IBehavior {
+export class BehaviorClass implements IChatCommand {
     command = "!hello";
     twitchClient: TwitchClient;
 

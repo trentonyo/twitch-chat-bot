@@ -2,9 +2,10 @@ import { ChatBotConfig } from './../config/config.model';
 import { TwitchTokenDetails } from './../models/twitchTokenDetails.models';
 import { TwitchTokenResponseValidator } from './../utils/TwitchTokenResponseValidator';
 import { MalformedTwitchRequestError, NoTwitchResponseError, TwitchResponseError } from '../models/error.model';
-import { IBehavior } from '../behaviors/IBehavior';
+import { IChatCommand } from '../behaviors/IChatCommand';
 import fs from 'fs';
 import path from 'path';
+import {IChatTrigger} from "../behaviors/IChatTrigger";
 
 export class TwitchChatBot {
 
@@ -12,7 +13,8 @@ export class TwitchChatBot {
 
     public twitchClient: any;
     private tokenDetails!: TwitchTokenDetails;
-    private behaviors: IBehavior[] = [];
+    private chatCommands: IChatCommand[] = [];
+    private chatTriggers: IChatTrigger[] = [];
 
     constructor(private config: ChatBotConfig) { }
 
@@ -73,13 +75,18 @@ export class TwitchChatBot {
         const files = fs.readdirSync(behaviorsDir);
 
         for (const file of files) {
-            if (!file.startsWith("IBehavior") && (file.endsWith('.ts') || file.endsWith('.js'))) {
-                const behaviorModule = await import(path.join(behaviorsDir, file));
-                const BehaviorClass = behaviorModule.default || Object.values(behaviorModule)[0];  // Check for default export first
-                const behaviorInstance = new (BehaviorClass as any)(this.twitchClient);
+            if (!file.startsWith("IChat") && (file.endsWith('.ts') || file.endsWith('.js'))) {
+                const chatBehavior = await import(path.join(behaviorsDir, file));
+                const ChatClass = chatBehavior.default || Object.values(chatBehavior)[0];  // Check for default export first
+                const chatInstance = new (ChatClass as any)(this.twitchClient);
 
-                if ('execute' in behaviorInstance && 'command' in behaviorInstance) {
-                    this.behaviors.push(behaviorInstance);
+                // Commands are invoked by "!commandName" messages
+                if ('execute' in chatInstance && 'command' in chatInstance) {
+                    this.chatCommands.push(chatInstance);
+                }
+                // Triggers are invoked by matching a regex string
+                else if ('execute' in chatInstance && 'regex' in chatInstance) {
+                    this.chatTriggers.push(chatInstance);
                 }
             }
         }
@@ -90,9 +97,16 @@ export class TwitchChatBot {
 
         this.twitchClient.on('message', (channel: any, tags: any, message: string, self: any) => {
             if (message.toLowerCase().startsWith('!')) {
-                for (const behavior of this.behaviors) {
-                    if (message.toLowerCase() === behavior.command) {
-                        behavior.execute(channel, tags, message);
+                for (const chatCommand of this.chatCommands) {
+                    if (message.toLowerCase() === chatCommand.command) {
+                        chatCommand.execute(channel, tags, message);
+                        break;
+                    }
+                }
+            } else if (!self) {
+                for (const chatTrigger of this.chatTriggers) {
+                    if (message.match(chatTrigger.regex)) {
+                        chatTrigger.execute(channel, tags, message);
                         break;
                     }
                 }

@@ -9,6 +9,7 @@ npm install
 
 # Authorization URL
 AUTH_URL="https://id.twitch.tv/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=chat:read%20chat:edit"
+#https://id.twitch.tv/oauth2/authorize?client_id=w322c0h23vfk7o6x3ymj3l03l6m5ic&redirect_uri=http://localhost&response_type=code&scope=chat:read%20chat:edit
 
 # Open the URL in the default browser
 echo "Opening browser for authorization..."

@@ -1,8 +1,8 @@
-import { IBehavior } from './IBehavior';
+import { IChatCommand } from './IChatCommand';
 import { TwitchClient } from 'tmi.js';
 import {randomInt} from "node:crypto";
 
-export class BehaviorClass implements IBehavior {
+export class BehaviorClass implements IChatCommand {
     command = "!rand";
     twitchClient: TwitchClient;
 
