@@ -7,19 +7,24 @@ import fs from 'fs';
 import path from 'path';
 import {IChatTrigger} from "../behaviors/IChatTrigger";
 import { Pool } from 'pg';
+import {DBModel} from "../database/dbModel";
 
 export class TwitchChatBot {
 
     tmi = require('tmi.js');
 
     public twitchClient: any;
+    private data: DBModel;
+
     private tokenDetails!: TwitchTokenDetails;
     private chatCommands: IChatCommand[] = [];
     private chatTriggers: IChatTrigger[] = [];
 
     private commandStrings: string[] = [];
 
-    constructor(private config: ChatBotConfig, private dbPool: Pool) { }
+    constructor(private config: ChatBotConfig, private dbPool: Pool) {
+        this.data = new DBModel(dbPool);
+    }
 
     async launch() {
         this.tokenDetails = await this.fetchAccessToken();
@@ -81,7 +86,7 @@ export class TwitchChatBot {
             if (!file.startsWith("IChat") && (file.endsWith('.ts') || file.endsWith('.js'))) {
                 const chatBehavior = await import(path.join(behaviorsDir, file));
                 const ChatClass = chatBehavior.default || Object.values(chatBehavior)[0];  // Check for default export first
-                const chatInstance = new (ChatClass as any)(this.twitchClient, this.dbPool);
+                const chatInstance = new (ChatClass as any)(this.twitchClient, this.data);
 
                 // Commands are invoked by "!commandName" messages
                 if ('execute' in chatInstance &&

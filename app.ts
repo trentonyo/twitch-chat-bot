@@ -1,7 +1,7 @@
 import { ChatBotConfig } from './src/app/config/config.model';
 import { ConfigValidator } from './src/app/config/config-validator';
 import { TwitchChatBot } from './src/app/chatBot/chatbot';
-import {connectToDatabase, pool} from './src/app/dbConnection/database';
+import {connectToDatabase, pool} from './src/app/database/dbConnection';
 
 ConfigValidator.readConfig('./config.json')
     .then((config: ChatBotConfig) => {
