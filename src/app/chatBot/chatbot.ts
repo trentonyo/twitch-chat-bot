@@ -6,6 +6,7 @@ import { IChatCommand } from '../behaviors/IChatCommand';
 import fs from 'fs';
 import path from 'path';
 import {IChatTrigger} from "../behaviors/IChatTrigger";
+import { Pool } from 'pg';
 
 export class TwitchChatBot {
 
@@ -16,7 +17,9 @@ export class TwitchChatBot {
     private chatCommands: IChatCommand[] = [];
     private chatTriggers: IChatTrigger[] = [];
 
-    constructor(private config: ChatBotConfig) { }
+    private commandStrings: string[] = [];
+
+    constructor(private config: ChatBotConfig, private dbPool: Pool) { }
 
     async launch() {
         this.tokenDetails = await this.fetchAccessToken();
@@ -81,11 +84,19 @@ export class TwitchChatBot {
                 const chatInstance = new (ChatClass as any)(this.twitchClient);
 
                 // Commands are invoked by "!commandName" messages
-                if ('execute' in chatInstance && 'command' in chatInstance) {
-                    this.chatCommands.push(chatInstance);
+                if ('execute' in chatInstance &&
+                    'command' in chatInstance
+                ) {
+                    if (this.commandStrings.includes(chatInstance.command)) {
+                        throw Error(`Command collision: ${path.join(behaviorsDir, file)}: ${chatInstance.command}`)
+                    } else {
+                        this.chatCommands.push(chatInstance);
+                        this.commandStrings.push(chatInstance.command);
+                    }
                 }
                 // Triggers are invoked by matching a regex string
-                else if ('execute' in chatInstance && 'regex' in chatInstance) {
+                else if ('execute' in chatInstance &&
+                    'regex' in chatInstance) {
                     this.chatTriggers.push(chatInstance);
                 }
             }
