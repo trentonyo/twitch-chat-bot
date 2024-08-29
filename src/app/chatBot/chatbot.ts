@@ -114,7 +114,7 @@ export class TwitchChatBot {
         this.twitchClient.on('message', (channel: any, tags: any, message: string, self: any) => {
             if (message.toLowerCase().startsWith('!')) {
                 for (const chatCommand of this.chatCommands) {
-                    if (message.toLowerCase() === chatCommand.command) {
+                    if (message.toLowerCase().startsWith(chatCommand.command)) {
                         chatCommand.execute(channel, tags, message);
                         break;
                     }

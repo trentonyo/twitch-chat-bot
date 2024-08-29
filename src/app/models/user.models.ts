@@ -28,11 +28,11 @@ export class User {
 
     @IsNotEmpty()
     @IsDate()
-    created_at: object;
+    created_at: Date;
 
     @IsNotEmpty()
     @IsDate()
-    last_seen: object;
+    last_seen: Date;
 
     constructor(
         res: object
@@ -47,4 +47,7 @@ export class User {
         this.last_seen = res["last_seen"];
     }
 
+    isMod(): boolean {
+        return this.role >= 100;
+    }
 }

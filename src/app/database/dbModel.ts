@@ -10,4 +10,18 @@ export class DBModel {
 
         return new User(res.rows[0])
     }
+
+    async updateUser(modified: User): Promise<void> {
+        const query = `UPDATE users SET 
+            username = '${modified.username}',
+            score = ${modified.score},
+            gold_stars = ${modified.gold_stars},
+            role = ${modified.role},
+            watch_seconds = ${modified.watch_seconds},
+            created_at = '${modified.created_at.toISOString()}',
+            last_seen = '${modified.last_seen.toISOString()}'
+            WHERE id = ${modified.id}`;
+
+        await this.dbPool.query(query);
+    }
 }
