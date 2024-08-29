@@ -6,7 +6,7 @@ export class BehaviorClass implements IChatCommand {
     command = "!rand";
     twitchClient: TwitchClient;
 
-    constructor(twitchClient: TwitchClient) {
+    constructor(twitchClient: TwitchClient, _: any) {
         this.twitchClient = twitchClient;
     }
 

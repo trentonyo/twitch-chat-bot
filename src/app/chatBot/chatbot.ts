@@ -81,7 +81,7 @@ export class TwitchChatBot {
             if (!file.startsWith("IChat") && (file.endsWith('.ts') || file.endsWith('.js'))) {
                 const chatBehavior = await import(path.join(behaviorsDir, file));
                 const ChatClass = chatBehavior.default || Object.values(chatBehavior)[0];  // Check for default export first
-                const chatInstance = new (ChatClass as any)(this.twitchClient);
+                const chatInstance = new (ChatClass as any)(this.twitchClient, this.dbPool);
 
                 // Commands are invoked by "!commandName" messages
                 if ('execute' in chatInstance &&
