@@ -34,6 +34,8 @@ export class User {
     @IsDate()
     last_seen: Date;
 
+    newUser: boolean;
+
     constructor(
         res: object
     ) {
@@ -45,9 +47,18 @@ export class User {
         this.watch_seconds = res["watch_seconds"];
         this.created_at = res["created_at"];
         this.last_seen = res["last_seen"];
+        this.newUser = true
     }
 
     isMod(): boolean {
         return this.role >= 100;
+    }
+
+    isNew(): boolean {
+        return this.newUser;
+    }
+
+    notNew(): void {
+        this.newUser = false;
     }
 }

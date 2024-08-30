@@ -111,7 +111,8 @@ export class TwitchChatBot {
     private async setupBotBehavior() {
         await this.loadBehaviors();
 
-        this.twitchClient.on('message', (channel: any, tags: any, message: string, self: any) => {
+        this.twitchClient.on('message', async (channel: any, tags: any, message: string, self: any) => {
+            // Handle special messages
             if (message.toLowerCase().startsWith('!')) {
                 for (const chatCommand of this.chatCommands) {
                     if (message.toLowerCase().startsWith(chatCommand.command)) {
@@ -127,6 +128,22 @@ export class TwitchChatBot {
                     }
                 }
             }
+
+            /***************************
+             * On every message behavior
+             */
+            let user = await this.data.getUser(tags.username)
+
+            // Welcome new users
+            if (user.isNew()) {
+                this.twitchClient.say(channel, `We're glad to have you, ${user.username}! Here are some points and a star to get you started!`);
+                await this.data.giveUserPoints(user, 99)
+                await this.data.giveUserStars(user, 1)
+                user.notNew()
+            }
+
+            // Every message is worth 1 point
+            await this.data.giveUsernamePoints(tags.username, 1)
         });
     }
 

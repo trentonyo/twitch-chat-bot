@@ -1,6 +1,5 @@
 import { IChatCommand } from './IChatCommand';
 import { TwitchClient } from 'tmi.js';
-import { Pool } from 'pg';
 import {DBModel} from "../database/dbModel";
 
 export class BehaviorClass implements IChatCommand {
@@ -19,12 +18,11 @@ export class BehaviorClass implements IChatCommand {
         let targets = message.split(" ").slice(1)
         if (user.isMod() && targets.length > 0) {
             for (let targetUser in targets) {
-                let target = await this.database.getUser(targets[targetUser]);
-                target.gold_stars++
-                await this.database.updateUser(target)
+                let user = await this.database.getUser(targets[targetUser], false)
+                await this.database.giveUserStars(user);
             }
         } else {
-            this.twitchClient.say(channel, `${user.username} has ${user.gold_stars} stars!`);
+            this.twitchClient.say(channel, `${user.username} has ⭐${user.gold_stars}`);
         }
     }
 }
