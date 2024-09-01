@@ -1,6 +1,8 @@
 import {IsArray, IsDate, IsNotEmpty, IsNumber, IsObject, IsString} from "class-validator";
 import {type} from "node:os";
 
+export const DEFAULT_PARTICIPANTS = {"believers": [], "deniers": [], "neutrals": []}
+
 export class Ramble {
 
     @IsNotEmpty()
@@ -11,15 +13,9 @@ export class Ramble {
     @IsObject()
     tags: object;
 
-    // @IsNotEmpty()
-    // @IsArray()
-    // @IsString({ each: true })
-    // believers: string[];
-    //
-    // @IsNotEmpty()
-    // @IsArray()
-    // @IsString({ each: true })
-    // deniers: string[];
+    @IsNotEmpty()
+    @IsObject()
+    participants: object;
 
     @IsNotEmpty()
     @IsDate()
@@ -36,8 +32,7 @@ export class Ramble {
     ) {
         this.id = res["id"];
         this.tags = res["tags"] || {};
-        // this.believers = res["believers"] || [];
-        // this.deniers = res["deniers"] || [];
+        this.participants = res["believers"] || DEFAULT_PARTICIPANTS
         this.started_at = res["started_at"];
         this.ended_at = res["ended_at"];
         this.newRamble = true

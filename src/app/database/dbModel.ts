@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
 import { User } from "../models/user.models";
-import { Ramble } from "../models/ramble.models";
+import {DEFAULT_PARTICIPANTS, Ramble} from "../models/ramble.models";
 
 export class DBModel {
 
@@ -113,29 +113,21 @@ export class DBModel {
         if (res.rows.length === 0) {
             const newRamble = new Ramble({
                 tags: {},
-                // believers: [],
-                // deniers: [],
+                participants: DEFAULT_PARTICIPANTS,
                 started_at: new Date(),
                 ended_at: null,
                 newRamble: true
             });
 
-            // const insertQuery = `
-            //     INSERT INTO rambles (tags, believers, deniers, started_at, ended_at)
-            //     VALUES ($1, $2, $3, $4, $5)
-            //         RETURNING *;
-            // `;
-
             const insertQuery = `
-                INSERT INTO rambles (tags, started_at, ended_at) 
-                VALUES ($1, $2, $3)
-                RETURNING *;
+                INSERT INTO rambles (tags, participants, started_at, ended_at)
+                VALUES ($1, $2, $3, $4)
+                    RETURNING *;
             `;
 
             const insertRes = await this.dbPool.query(insertQuery, [
                 newRamble.tags,
-                // newRamble.believers,
-                // newRamble.deniers,
+                newRamble.participants,
                 newRamble.started_at.toISOString(),
                 null
             ]);
@@ -147,27 +139,18 @@ export class DBModel {
     }
 
     async updateRamble(ramble: Ramble): Promise<void> {
-        // const query = `
-        //     UPDATE rambles SET
-        //            tags = $1,
-        //            believers = $2,
-        //            deniers = $3,
-        //            started_at = $4,
-        //            ended_at = $5
-        //     WHERE id = $6;
-        // `;
         const query = `
             UPDATE rambles SET
                    tags = $1,
-                   started_at = $2,
-                   ended_at = $3
-            WHERE id = $4;
+                   participants = $2,
+                   started_at = $3,
+                   ended_at = $4
+            WHERE id = $5;
         `;
 
         const values = [
             ramble.tags,
-            // ramble.believers,
-            // ramble.deniers,
+            ramble.participants,
             ramble.started_at?.toISOString() ?? null,
             ramble.ended_at?.toISOString() ?? null,
             ramble.id
