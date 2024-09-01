@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
 import { User } from "../models/user.models";
-import {DEFAULT_PARTICIPANTS, Ramble} from "../models/ramble.models";
+import { Ramble } from "../models/ramble.models";
 
 export class DBModel {
 
@@ -113,7 +113,7 @@ export class DBModel {
         if (res.rows.length === 0) {
             const newRamble = new Ramble({
                 tags: {},
-                participants: DEFAULT_PARTICIPANTS,
+                participants: {believers: [], deniers: [], neutrals: []},
                 started_at: new Date(),
                 ended_at: null,
                 newRamble: true
@@ -135,7 +135,9 @@ export class DBModel {
             return new Ramble(insertRes.rows[0]);
         }
 
-        return new Ramble(res.rows[0]);
+        let existingRamble = new Ramble(res.rows[0])
+        existingRamble.notNew()
+        return existingRamble;
     }
 
     async updateRamble(ramble: Ramble): Promise<void> {

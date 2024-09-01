@@ -27,11 +27,11 @@ export class BehaviorClass implements IChatCommand {
 
             if (token.match(this.believeRegex))
             {
-                // ramble.addBeliever(tags.username)
+                ramble.makeBeliever(tags.username)
                 believer = true
             } else if (token.match(this.denyRegex)) 
             {
-                // ramble.addDenier(tags.username)
+                ramble.makeDenier(tags.username)
                 denier = true
             } else 
             {
