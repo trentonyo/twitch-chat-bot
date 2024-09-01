@@ -20,6 +20,7 @@ export class BehaviorClass implements IChatCommand {
 
         let believer = false
         let denier = false
+        let defector = false
 
         let lex = message.split(" ").slice(1)
         for (const i in lex) {
@@ -27,11 +28,11 @@ export class BehaviorClass implements IChatCommand {
 
             if (token.match(this.believeRegex))
             {
-                ramble.makeBeliever(tags.username)
+                defector = ramble.makeBeliever(tags.username)
                 believer = true
             } else if (token.match(this.denyRegex)) 
             {
-                ramble.makeDenier(tags.username)
+                defector = ramble.makeDenier(tags.username)
                 denier = true
             } else 
             {
@@ -42,7 +43,7 @@ export class BehaviorClass implements IChatCommand {
         let msg = ""
         const sortedTags = ramble.getSortedTags()
 
-        let tagsSnippet = "["
+        let tagsSnippet = "[ramble tags: "
         for (let i = 0; i < sortedTags.length; i++) {
             if (i > 0)
                 tagsSnippet += " "
@@ -61,9 +62,7 @@ export class BehaviorClass implements IChatCommand {
 
             msg += "!"
         } else {
-            // const stance = ramble.getUserStance(tags.username)
-            const stance = "neutral"
-            if (stance === "neutral") {
+            if (!defector) {
                 msg = `Count ${tags.username}`
 
                 if (believer) {
@@ -76,13 +75,12 @@ export class BehaviorClass implements IChatCommand {
                     msg += " in on the ramble (undeclared)"
                 }
             } else {
-                if (believer && stance === "denier") {
+                if (believer && defector) {
                     msg = `${tags.username} turns! Now they are team BELIEVE!`
-                } else if (denier && stance === "believer") {
+                } else if (denier && defector) {
                     msg = `${tags.username} defects! Now they are team DENY!`
                 }
             }
-
         }
 
         msg += `\n${tagsSnippet}`

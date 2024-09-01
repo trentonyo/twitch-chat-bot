@@ -125,4 +125,32 @@ export class Ramble {
             this.tags[tag] = 1;
         }
     }
+
+    end(): [string[], string[], string[], string] {
+        this.ended_at = new Date();
+
+        let winGroup: string;
+        let winners: string[];
+        let losers: string[];
+        let neutrals: string[];
+
+        if (this.participants.believers.length > this.participants.deniers.length) {
+            winGroup = "BELIEVERS"
+            winners = this.participants.believers
+            losers = this.participants.deniers
+            neutrals = this.participants.neutrals
+        } else if (this.participants.deniers.length > this.participants.believers.length) {
+            winGroup = "DENIERS"
+            winners = this.participants.deniers
+            losers = this.participants.believers
+            neutrals = this.participants.neutrals
+        } else {
+            winGroup = "TIE"
+            winners = []
+            losers = []
+            neutrals = [...this.participants.believers, ...this.participants.deniers, ...this.participants.neutrals];
+        }
+
+        return [winners, losers, neutrals, winGroup];
+    }
 }
