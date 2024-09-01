@@ -112,24 +112,30 @@ export class DBModel {
         // If there is not a ramble started, start one
         if (res.rows.length === 0) {
             const newRamble = new Ramble({
-                tags_json: "{}",
-                believers_json: "[]",
-                deniers_json: "[]",
+                tags: {},
+                // believers: [],
+                // deniers: [],
                 started_at: new Date(),
                 ended_at: null,
                 newRamble: true
             });
 
+            // const insertQuery = `
+            //     INSERT INTO rambles (tags, believers, deniers, started_at, ended_at)
+            //     VALUES ($1, $2, $3, $4, $5)
+            //         RETURNING *;
+            // `;
+
             const insertQuery = `
-                INSERT INTO rambles (tags_json, believers_json, deniers_json, started_at, ended_at) 
-                VALUES ($1, $2, $3, $4, $5)
+                INSERT INTO rambles (tags, started_at, ended_at) 
+                VALUES ($1, $2, $3)
                 RETURNING *;
             `;
 
             const insertRes = await this.dbPool.query(insertQuery, [
-                newRamble.tags_json,
-                newRamble.believers_json,
-                newRamble.deniers_json,
+                newRamble.tags,
+                // newRamble.believers,
+                // newRamble.deniers,
                 newRamble.started_at.toISOString(),
                 null
             ]);
@@ -141,20 +147,27 @@ export class DBModel {
     }
 
     async updateRamble(ramble: Ramble): Promise<void> {
+        // const query = `
+        //     UPDATE rambles SET
+        //            tags = $1,
+        //            believers = $2,
+        //            deniers = $3,
+        //            started_at = $4,
+        //            ended_at = $5
+        //     WHERE id = $6;
+        // `;
         const query = `
             UPDATE rambles SET
-                   tags_json = $1,
-                   believers_json = $2,
-                   deniers_json = $3,
-                   started_at = $4,
-                   ended_at = $5
-            WHERE id = $6;
+                   tags = $1,
+                   started_at = $2,
+                   ended_at = $3
+            WHERE id = $4;
         `;
 
         const values = [
-            ramble.tags_json,
-            ramble.believers_json,
-            ramble.deniers_json,
+            ramble.tags,
+            // ramble.believers,
+            // ramble.deniers,
             ramble.started_at?.toISOString() ?? null,
             ramble.ended_at?.toISOString() ?? null,
             ramble.id

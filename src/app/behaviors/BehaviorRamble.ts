@@ -27,11 +27,11 @@ export class BehaviorClass implements IChatCommand {
 
             if (token.match(this.believeRegex))
             {
-                ramble.addBeliever(tags.username)
+                // ramble.addBeliever(tags.username)
                 believer = true
             } else if (token.match(this.denyRegex)) 
             {
-                ramble.addDenier(tags.username)
+                // ramble.addDenier(tags.username)
                 denier = true
             } else 
             {
@@ -61,16 +61,17 @@ export class BehaviorClass implements IChatCommand {
 
             msg += "!"
         } else {
-            const stance = ramble.getUserStance(tags.username)
+            // const stance = ramble.getUserStance(tags.username)
+            const stance = "neutral"
             if (stance === "neutral") {
                 msg = `Count ${tags.username}`
 
                 if (believer) {
                     msg += " as a believer"
-                    ramble.addBeliever(tags.username)
+                    // ramble.addBeliever(tags.username)
                 } else if (denier) {
                     msg += " as a denier"
-                    ramble.addDenier(tags.username)
+                    // ramble.addDenier(tags.username)
                 } else {
                     msg += " in on the ramble (undeclared)"
                 }
