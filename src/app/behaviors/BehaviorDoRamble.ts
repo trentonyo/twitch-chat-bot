@@ -16,7 +16,10 @@ export class BehaviorClass implements IChatCommand {
     }
 
     async execute(channel: any, tags: any, message: any) {
-        let ramble = await this.database.getRamble()
+        let ramble = await this.database.getRamble() // Does not need a null check because this call can create a new Ramble
+
+        if (!ramble) // Safety check
+            return
 
         let believer = false
         let denier = false

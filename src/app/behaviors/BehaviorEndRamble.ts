@@ -16,7 +16,10 @@ export class BehaviorClass implements IChatCommand {
         let executor = await this.database.getUser(tags.username)
 
         if (executor.isMod()) {
-            let ramble = await this.database.getRamble()
+            let ramble = await this.database.getRamble(false) // Do not create a new ramble
+
+            if (!ramble) // If called when there is no ramble, do nothing
+                return
 
             let [winners, losers, neutrals, winGroup] = ramble.end();
 

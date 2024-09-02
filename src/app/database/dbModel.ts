@@ -101,13 +101,17 @@ export class DBModel {
     /************
      * Ramble stuff
      */
-    async getRamble(): Promise<Ramble> {
+    async getRamble(canCreateNew: boolean = true): Promise<Ramble | null> {
         const getQuery = `SELECT *
                           FROM rambles
                           WHERE ended_at IS NULL`;
 
         // Try to get a running ramble
         const res = await this.dbPool.query(getQuery);
+
+        // If this call should not initialize a new Ramble, return null
+        if (!canCreateNew && res.rows.length === 0)
+            return null
 
         // If there is not a ramble started, start one
         if (res.rows.length === 0) {
