@@ -10,13 +10,17 @@ const pool = new Pool({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     port: Number(process.env.DB_PORT),
+    options: `-c timezone=${process.env.DB_TIMEZONE || 'America/Los_Angeles'}`,
 });
 
 const connectToDatabase = () => {
     return new Promise((resolve, reject) => {
         pool.connect()
-            .then(client => {
+            .then(async client => {
                 console.log('Connected to the database successfully');
+
+                const res = await client.query('SHOW timezone;');
+                console.log('Current PostgreSQL Timezone Setting:', res.rows[0]);
                 client.release();
                 resolve(true);
             })
