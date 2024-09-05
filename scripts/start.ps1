@@ -1,14 +1,21 @@
+param (
+    [string]$EnvFile = ".env"
+)
+
 # Load the .env file
-if (Test-Path .env) {
-    Get-Content .env |
-        ForEach-Object {
-            if ($_ -notmatch '^#' -and $_.Trim() -ne "") {
-                $name, $value = $_ -split '=', 2
-                if ($name.Trim() -ne "") {
-                    [System.Environment]::SetEnvironmentVariable($name.Trim(), $value.Trim())
+if (Test-Path $EnvFile)
+{
+    Get-Content $EnvFile |
+            ForEach-Object {
+                if ($_ -notmatch '^#' -and $_.Trim() -ne "")
+                {
+                    $name, $value = $_ -split '=', 2
+                    if ($name.Trim() -ne "")
+                    {
+                        [System.Environment]::SetEnvironmentVariable($name.Trim(),$value.Trim())
+                    }
                 }
             }
-        }
 }
 
 npm install

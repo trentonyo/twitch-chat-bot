@@ -1,8 +1,9 @@
 #!/bin/bash
 
-# Load the .env file
-if [ -f .env ]; then
-    export $(grep -v '^#' .env | xargs)
+# Load the .env file or a specified path
+ENV_FILE=${1:-.env}
+if [ -f "$ENV_FILE" ]; then
+    export $(grep -v '^#' "$ENV_FILE" | xargs)
 fi
 
 npm install

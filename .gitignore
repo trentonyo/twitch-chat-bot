@@ -74,7 +74,7 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
+ignorethisenv
 .env.test
 .env*.local
 

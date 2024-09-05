@@ -1,10 +1,11 @@
-import { Pool } from 'pg';
-import { User } from "../models/user.models";
-import { Ramble } from "../models/ramble.models";
+import {Pool} from 'pg';
+import {User} from "../models/user.models";
+import {Ramble} from "../models/ramble.models";
 
 export class DBModel {
 
-    constructor(public dbPool: Pool) { }
+    constructor(public dbPool: Pool) {
+    }
 
     /*************
      * User stuff
@@ -12,9 +13,10 @@ export class DBModel {
     async getUser(username: string, updateLastSeen: boolean = true): Promise<User> {
         const updateQuery = `UPDATE users
                              SET last_seen = NOW()
-                             WHERE username = $1
-                             RETURNING *`;
-        const getQuery = `SELECT * FROM users WHERE username = $1`;
+                             WHERE username = $1 RETURNING *`;
+        const getQuery = `SELECT *
+                          FROM users
+                          WHERE username = $1`;
 
         const res = await this.dbPool.query(updateLastSeen ? updateQuery : getQuery, [username]);
 
@@ -31,9 +33,8 @@ export class DBModel {
             });
 
             const insertQuery = `
-                INSERT INTO users (username, score, gold_stars, role, watch_seconds, created_at, last_seen) 
-                VALUES ($1, $2, $3, $4, $5, $6, $7)
-                RETURNING *;
+                INSERT INTO users (username, score, gold_stars, role, watch_seconds, created_at, last_seen)
+                VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;
             `;
 
             const insertRes = await this.dbPool.query(insertQuery, [
@@ -54,15 +55,15 @@ export class DBModel {
     }
 
     async updateUser(modified: User): Promise<void> {
-        const query = `UPDATE users SET 
-            username = $1,
-            score = $2,
-            gold_stars = $3,
-            role = $4,
-            watch_seconds = $5,
-            created_at = $6,
-            last_seen = $7
-            WHERE id = $8`;
+        const query = `UPDATE users
+                       SET username      = $1,
+                           score         = $2,
+                           gold_stars    = $3,
+                           role          = $4,
+                           watch_seconds = $5,
+                           created_at    = $6,
+                           last_seen     = $7
+                       WHERE id = $8`;
 
         await this.dbPool.query(query, [
             modified.username,
@@ -102,11 +103,6 @@ export class DBModel {
      * Ramble stuff
      */
     async getRamble(canCreateNew: boolean = true): Promise<Ramble | null> {
-        // const getQuery = `SELECT *
-        //                   FROM rambles
-        //                   WHERE ended_at IS NULL`;
-
-
         const getQuery = `SELECT id,
                                  started_at,
                                  ended_at,
@@ -117,24 +113,28 @@ export class DBModel {
                           WHERE ended_at IS NULL`;
 
         // Try to get a running ramble
-        const res = await this.dbPool.query(getQuery);
+        const res = await this.dbPool.query(getQuery)
 
         // If this call should not initialize a new Ramble, return null
         if (!canCreateNew && res.rows.length === 0)
             return null
 
-        // If there is not a ramble started, start one
+        // If there is not a ramble started, start one with empty tags and participants
         if (res.rows.length === 0) {
             const newRamble = new Ramble({
                 tags: {},
-                participants: {believers: [], deniers: [], neutrals: []},
-                newRamble: true
+                participants: {believers: [], deniers: [], neutrals: []}
             });
 
             const insertQuery = `
                 INSERT INTO rambles (tags, participants)
-                VALUES ($1, $2)
-                    RETURNING *;
+                VALUES ($1, $2) RETURNING    id,
+                                 started_at,
+                                 ended_at,
+                                 tags,
+                                 participants,
+                                 CURRENT_TIMESTAMP - started_at::timestamp
+                with time zone AS elapsed;
             `;
 
             const insertRes = await this.dbPool.query(insertQuery, [
@@ -152,11 +152,11 @@ export class DBModel {
 
     async updateRamble(ramble: Ramble): Promise<void> {
         const query = `
-            UPDATE rambles SET
-                   tags = $1,
-                   participants = $2,
-                   started_at = $3,
-                   ended_at = $4
+            UPDATE rambles
+            SET tags         = $1,
+                participants = $2,
+                started_at   = $3,
+                ended_at     = $4
             WHERE id = $5;
         `;
 

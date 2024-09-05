@@ -75,21 +75,20 @@ export class BehaviorClass implements IChatCommand {
                 msg = `Count ${tags.username}`
 
                 if (believer) {
-                    msg += " as a believer"
+                    msg += " as a believer (BELIEVER)"
                     // ramble.addBeliever(tags.username)
                 } else if (denier) {
-                    msg += " as a denier"
+                    msg += " as a denier (DENIER)"
                     // ramble.addDenier(tags.username)
                 } else {
-                    msg += " in on the ramble (undeclared)"
+                    msg += " as on the fence (NEUTRAL)"
                 }
+
             } else {
                 if (believer && defector) {
                     msg = `${tags.username} turns! Now they are team BELIEVE!`
                 } else if (denier && defector) {
                     msg = `${tags.username} defects! Now they are team DENY!`
-                } else if (neutral) {
-                    msg = `${tags.username} is on the fence, they are team NEUTRAL!`
                 }
             }
         }

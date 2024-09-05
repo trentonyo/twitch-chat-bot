@@ -32,10 +32,9 @@ export class Ramble {
     @Type(() => Date)
     ended_at: Date | null;
 
-    @IsOptional()
-    @IsDate()
-    @Type(() => Date)
-    elapsed: Date | null;
+    @IsNotEmpty()
+    @IsObject()
+    elapsed: { [key: string]: number };
 
     newRamble: boolean;
 
@@ -45,7 +44,12 @@ export class Ramble {
         this.participants = res.participants || { believers: [], deniers: [], neutrals: [] };
         this.started_at = res.started_at ? new Date(res.started_at) : new Date();
         this.ended_at = res.ended_at ? new Date(res.ended_at) : null;
-        this.elapsed = res.elapsed ? new Date(res.elapsed) : null;
+        this.elapsed = res.elapsed !== undefined && res.elapsed !== null ? res.elapsed : {
+            "hours": 0,
+            "minutes": 0,
+            "seconds": 0,
+            "milliseconds": 0.0
+        };
         this.newRamble = res.newRamble || true;
     }
 
