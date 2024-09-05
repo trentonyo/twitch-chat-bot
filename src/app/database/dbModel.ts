@@ -108,6 +108,7 @@ export class DBModel {
                                  ended_at,
                                  tags,
                                  participants,
+--                                  CURRENT_TIMESTAMP - started_at::timestamp AS elapsed
                                  CURRENT_TIMESTAMP - started_at::timestamp with time zone AS elapsed
                           FROM rambles
                           WHERE ended_at IS NULL`;
@@ -133,8 +134,7 @@ export class DBModel {
                                  ended_at,
                                  tags,
                                  participants,
-                                 CURRENT_TIMESTAMP - started_at::timestamp
-                with time zone AS elapsed;
+                                 CURRENT_TIMESTAMP - started_at::timestamp AS elapsed;
             `;
 
             const insertRes = await this.dbPool.query(insertQuery, [
@@ -154,17 +154,13 @@ export class DBModel {
         const query = `
             UPDATE rambles
             SET tags         = $1,
-                participants = $2,
-                started_at   = $3,
-                ended_at     = $4
-            WHERE id = $5;
+                participants = $2
+            WHERE id = $3;
         `;
 
         const values = [
             ramble.tags,
             ramble.participants,
-            ramble.started_at?.toISOString() ?? null,
-            ramble.ended_at?.toISOString() ?? null,
             ramble.id
         ];
 
