@@ -102,7 +102,17 @@ export class DBModel {
      * Ramble stuff
      */
     async getRamble(canCreateNew: boolean = true): Promise<Ramble | null> {
-        const getQuery = `SELECT *
+        // const getQuery = `SELECT *
+        //                   FROM rambles
+        //                   WHERE ended_at IS NULL`;
+
+
+        const getQuery = `SELECT id,
+                                 started_at,
+                                 ended_at,
+                                 tags,
+                                 participants,
+                                 CURRENT_TIMESTAMP - started_at::timestamp with time zone AS elapsed
                           FROM rambles
                           WHERE ended_at IS NULL`;
 
@@ -118,22 +128,18 @@ export class DBModel {
             const newRamble = new Ramble({
                 tags: {},
                 participants: {believers: [], deniers: [], neutrals: []},
-                started_at: new Date(),
-                ended_at: null,
                 newRamble: true
             });
 
             const insertQuery = `
-                INSERT INTO rambles (tags, participants, started_at, ended_at)
-                VALUES ($1, $2, $3, $4)
+                INSERT INTO rambles (tags, participants)
+                VALUES ($1, $2)
                     RETURNING *;
             `;
 
             const insertRes = await this.dbPool.query(insertQuery, [
                 newRamble.tags,
-                newRamble.participants,
-                newRamble.started_at.toISOString(),
-                null
+                newRamble.participants
             ]);
 
             return new Ramble(insertRes.rows[0]);

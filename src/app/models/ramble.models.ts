@@ -32,6 +32,11 @@ export class Ramble {
     @Type(() => Date)
     ended_at: Date | null;
 
+    @IsOptional()
+    @IsDate()
+    @Type(() => Date)
+    elapsed: Date | null;
+
     newRamble: boolean;
 
     constructor(res: Partial<Ramble>) {
@@ -40,7 +45,8 @@ export class Ramble {
         this.participants = res.participants || { believers: [], deniers: [], neutrals: [] };
         this.started_at = res.started_at ? new Date(res.started_at) : new Date();
         this.ended_at = res.ended_at ? new Date(res.ended_at) : null;
-        this.newRamble = res.newRamble || false;
+        this.elapsed = res.elapsed ? new Date(res.elapsed) : null;
+        this.newRamble = res.newRamble || true;
     }
 
     isNew(): boolean {

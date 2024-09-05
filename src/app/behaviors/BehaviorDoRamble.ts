@@ -23,6 +23,7 @@ export class BehaviorClass implements IChatCommand {
 
         let believer = false
         let denier = false
+        let neutral = false
         let defector = false
 
         let lex = message.split(" ").slice(1)
@@ -41,6 +42,10 @@ export class BehaviorClass implements IChatCommand {
             {
                 ramble.addTag(token)
             }
+        }
+
+        if (!denier && !believer) {
+            neutral = ramble.makeNeutral(tags.username)
         }
 
         let msg = ""
@@ -65,6 +70,7 @@ export class BehaviorClass implements IChatCommand {
 
             msg += "!"
         } else {
+            // User is declaring their stance for the first time (or from neutral)
             if (!defector) {
                 msg = `Count ${tags.username}`
 
@@ -82,6 +88,8 @@ export class BehaviorClass implements IChatCommand {
                     msg = `${tags.username} turns! Now they are team BELIEVE!`
                 } else if (denier && defector) {
                     msg = `${tags.username} defects! Now they are team DENY!`
+                } else if (neutral) {
+                    msg = `${tags.username} is on the fence, they are team NEUTRAL!`
                 }
             }
         }
