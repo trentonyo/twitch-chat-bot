@@ -108,7 +108,6 @@ export class DBModel {
                                  ended_at,
                                  tags,
                                  participants,
---                                  CURRENT_TIMESTAMP - started_at::timestamp AS elapsed
                                  CURRENT_TIMESTAMP - started_at::timestamp with time zone AS elapsed
                           FROM rambles
                           WHERE ended_at IS NULL`;
@@ -155,6 +154,24 @@ export class DBModel {
             UPDATE rambles
             SET tags         = $1,
                 participants = $2
+            WHERE id = $3;
+        `;
+
+        const values = [
+            ramble.tags,
+            ramble.participants,
+            ramble.id
+        ];
+
+        await this.dbPool.query(query, values);
+    }
+
+    async endRamble(ramble: Ramble): Promise<void> {
+        const query = `
+            UPDATE rambles
+            SET tags         = $1,
+                participants = $2,
+                ended_at     = CURRENT_TIMESTAMP
             WHERE id = $3;
         `;
 

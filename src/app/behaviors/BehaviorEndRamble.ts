@@ -45,7 +45,7 @@ export class BehaviorClass implements IChatCommand {
             }
 
             this.twitchClient.say(channel, msg);
-            await this.database.updateRamble(ramble)
+            await this.database.endRamble(ramble)
         }
     }
 }
