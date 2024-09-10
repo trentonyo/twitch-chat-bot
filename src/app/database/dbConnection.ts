@@ -2,16 +2,19 @@ import { Pool } from 'pg';
 import * as dotenv from 'dotenv';
 
 // Load environment variables from .env file
-dotenv.config();
+const dotenvOptions = process.env.DEV_SERVER_ONLY ? {path: "../stream.env"} : {}
+dotenv.config(dotenvOptions);
 
-const pool = new Pool({
+const poolOptions = {
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     port: Number(process.env.DB_PORT),
     options: `-c timezone=${process.env.DB_TIMEZONE || 'America/Los_Angeles'}`,
-});
+}
+
+const pool = new Pool(poolOptions);
 
 const connectToDatabase = () => {
     return new Promise((resolve, reject) => {
